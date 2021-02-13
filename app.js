@@ -31,7 +31,6 @@ const showImages = (images) => {
 const getImages = (query) => {
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
-    // .then(data => console.log(data.hits))
     .then(data => showImages(data.hits))
     .catch(err => console.log(err))
 }
@@ -39,15 +38,15 @@ const getImages = (query) => {
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
-  element.classList.add('added');
+  element.classList.toggle('added');
  
   let item = sliders.indexOf(img);
   if (item === -1) {
     sliders.push(img);
-  } else {
-    alert('Hey, Already added !')
   }
 }
+
+
 var timer
 const createSlider = () => {
   // check slider image length
@@ -121,3 +120,8 @@ searchBtn.addEventListener('click', function () {
 sliderBtn.addEventListener('click', function () {
   createSlider()
 })
+document.getElementById('search').addEventListener("keypress", function (event) {
+  if (event.key === 'Enter') {
+      document.getElementById('search-btn').click()
+  }
+});
