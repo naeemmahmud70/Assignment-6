@@ -13,6 +13,12 @@ let sliders = [];
 // to create your own api key
 const KEY = '15674931-a9d714b6e9d654524df198e00&q';
 
+//press enter to show image list.
+document.getElementById('search').addEventListener("keypress", function (event) {
+  if (event.key === 'Enter') {
+    document.getElementById('search-btn').click()
+  }
+});
 
 // show images 
 const showImages = (images) => {
@@ -32,22 +38,25 @@ const showImages = (images) => {
 
 
 const getImages = (query) => {
+  const url = `https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`
   toggleSpinner(true);
-  fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
+  fetch(url)
     .then(response => response.json())
     .then(data => showImages(data.hits))
     .catch(error => displayError('Something went wrong!! Please try again latter!'));
 }
-
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
   element.classList.toggle('added');
 
-  let item = sliders.indexOf(img);
-  if (item === -1) {
+  if (element.classList.contains('added')) {
     sliders.push(img);
+  } 
+  else {
+    const index = sliders.indexOf(img);
+    sliders.splice(index, 1);
   }
 }
 
@@ -75,7 +84,7 @@ const createSlider = () => {
   // hide image aria
   imagesArea.style.display = 'none';
   const duration = document.getElementById('duration').value || 1000;
-  if(duration < 0){
+  if (duration < 0) {
     duration = 1000;
     sliders.forEach(slide => {
       let item = document.createElement('div')
@@ -91,22 +100,22 @@ const createSlider = () => {
       changeSlide(slideIndex);
     }, duration);
   }
-  else{
-  sliders.forEach(slide => {
-    let item = document.createElement('div')
-    item.className = "slider-item";
-    item.innerHTML = `<img class="w-100"
+  else {
+    sliders.forEach(slide => {
+      let item = document.createElement('div')
+      item.className = "slider-item";
+      item.innerHTML = `<img class="w-100"
     src="${slide}"
     alt="">`;
-    sliderContainer.appendChild(item)
-   
-  })
-  changeSlide(0)
-  timer = setInterval(function () {
-    slideIndex++;
-    changeSlide(slideIndex);
-  }, duration);
-}
+      sliderContainer.appendChild(item)
+
+    })
+    changeSlide(0)
+    timer = setInterval(function () {
+      slideIndex++;
+      changeSlide(slideIndex);
+    }, duration);
+  }
 }
 
 
@@ -147,23 +156,18 @@ searchBtn.addEventListener('click', function () {
 sliderBtn.addEventListener('click', function () {
   createSlider()
 })
-document.getElementById('search').addEventListener("keypress", function (event) {
-  if (event.key === 'Enter') {
-      document.getElementById('search-btn').click()
-  }
-});
 
 //Bonus task area.
 
 // show toggleSpinner.
-const toggleSpinner = (show) =>{
+const toggleSpinner = (show) => {
   const spinner = document.getElementById('loading-spinner')
-  if(show){
+  if (show) {
     spinner.classList.remove('d-none')
   }
-  else{
+  else {
     spinner.classList.add('d-none')
-  } 
+  }
 }
 
 //Show error message.
