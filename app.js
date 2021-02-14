@@ -13,6 +13,7 @@ let sliders = [];
 // to create your own api key
 const KEY = '15674931-a9d714b6e9d654524df198e00&q';
 
+
 // show images 
 const showImages = (images) => {
   imagesArea.style.display = 'block';
@@ -21,25 +22,29 @@ const showImages = (images) => {
   galleryHeader.style.display = 'flex';
   images.forEach(image => {
     let div = document.createElement('div');
-    div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
+    div.className = 'shadow col-lg-3 col-md-4 col-xs-6 img-item mb-2';
     div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
     gallery.appendChild(div)
+    toggleSpinner(false);
+    document.getElementById('search').value = "";
   })
-
 }
 
+
 const getImages = (query) => {
+  toggleSpinner(true);
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
     .then(data => showImages(data.hits))
-    .catch(err => console.log(err))
+    .catch(error => displayError('Something went wrong!! Please try again latter!'));
 }
+
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
   element.classList.toggle('added');
- 
+
   let item = sliders.indexOf(img);
   if (item === -1) {
     sliders.push(img);
@@ -54,6 +59,8 @@ const createSlider = () => {
     alert('Select at least 2 image.')
     return;
   }
+
+
   // crate slider previous next area
   sliderContainer.innerHTML = '';
   const prevNext = document.createElement('div');
@@ -62,12 +69,29 @@ const createSlider = () => {
   <span class="prev" onclick="changeItem(-1)"><i class="fas fa-chevron-left"></i></span>
   <span class="next" onclick="changeItem(1)"><i class="fas fa-chevron-right"></i></span>
   `;
-
   sliderContainer.appendChild(prevNext)
+
   document.querySelector('.main').style.display = 'block';
   // hide image aria
   imagesArea.style.display = 'none';
   const duration = document.getElementById('duration').value || 1000;
+  if(duration < 0){
+    duration = 1000;
+    sliders.forEach(slide => {
+      let item = document.createElement('div')
+      item.className = "slider-item";
+      item.innerHTML = `<img class="w-100"
+      src="${slide}"
+      alt="">`;
+      sliderContainer.appendChild(item)
+    })
+    changeSlide(0)
+    timer = setInterval(function () {
+      slideIndex++;
+      changeSlide(slideIndex);
+    }, duration);
+  }
+  else{
   sliders.forEach(slide => {
     let item = document.createElement('div')
     item.className = "slider-item";
@@ -75,6 +99,7 @@ const createSlider = () => {
     src="${slide}"
     alt="">`;
     sliderContainer.appendChild(item)
+   
   })
   changeSlide(0)
   timer = setInterval(function () {
@@ -82,6 +107,8 @@ const createSlider = () => {
     changeSlide(slideIndex);
   }, duration);
 }
+}
+
 
 // change slider index 
 const changeItem = index => {
@@ -125,3 +152,22 @@ document.getElementById('search').addEventListener("keypress", function (event) 
       document.getElementById('search-btn').click()
   }
 });
+
+//Bonus task area.
+
+// show toggleSpinner.
+const toggleSpinner = (show) =>{
+  const spinner = document.getElementById('loading-spinner')
+  if(show){
+    spinner.classList.remove('d-none')
+  }
+  else{
+    spinner.classList.add('d-none')
+  } 
+}
+
+//Show error message.
+const displayError = error => {
+  const errorTag = document.getElementById('error-message');
+  errorTag.innerText = error;
+}
